@@ -4,18 +4,49 @@ services:
   nginx:
     image: nginx:latest
     volumes:
-      - ./nginx/node.conf:/etc/nginx/conf.d/node.template
+      - ./nginx:/etc/nginx/conf.d:ro
     ports:
-      - '8080:80'
-    command: 'bash -c "cat /etc/nginx/conf.d/node.template > /etc/nginx/conf.d/default.conf && nginx -g ''daemon off;''"'
-  node:
-    image: node:10.14
-    user: node
-    working_dir: /home/node/app
+      - '80:80'
+    container_name: nginx
+
+  server8:
+    image: node:16-alpine3.11
+    working_dir: /home/app
     environment:
-      - NODE_ENV=production
+      - CHOKIDAR_USEPOLLING=true
+      - PORT=8000
+      - MSG=User
     volumes:
-      - ./app:/home/node/app
+      - ./app:/home/app
     ports:
-      - '3000:3000'
-    command: 'npm start'
+      - 8000:8000
+    command: >
+      node index.js
+  
+  server9:
+    image: node:16-alpine3.11
+    working_dir: /home/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - PORT=9000
+      - MSG=Admin
+    volumes:
+      - ./app:/home/app
+    ports:
+      - 9000:9000
+    command: >
+      node index.js
+
+  server3:
+    image: node:16-alpine3.11
+    working_dir: /home/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - PORT=3000
+      - MSG=Test
+    volumes:
+      - ./app:/home/app
+    ports:
+      - 3000:3000
+    command: >
+      node index.js
